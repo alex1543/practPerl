@@ -1,5 +1,6 @@
-#!C:\Strawberry\perl\bin\perl.exe
+#!perl
 
+# в переменную окружения Path добавить, например: C:\Strawberry\perl\bin\
 print "Content-type: text/html; charset=utf-8\n\n";
 open FILE, "head.inc" or die $!;
 print <FILE>;
@@ -11,7 +12,8 @@ my $user = "root";
 my $pass = "";
 my $db = "test";
 $dbh = DBI->connect("DBI:mysql:$db:$host:$port",$user,$pass);
-
+$sth = $dbh->prepare("SET NAMES utf8");
+$sth->execute;
 
 # обработка параметров формы.
 if($ENV{'REQUEST_METHOD'} eq 'GET') {
@@ -47,11 +49,7 @@ $sth = $dbh->prepare("SELECT * FROM myarttable WHERE id>14 ORDER BY id DESC;");
 $sth->execute;
 while ($ref = $sth->fetchrow_arrayref) {
 	print "<tr>\n";
-#	$length =  @ref;
-#	print $length;
-	for (my $i=0; $i <= 3; $i++) {
-		use Encode;
-		Encode::from_to($$ref[$i], 'utf-8', 'windows-1251');
+	for (my $i=0; $i <= $#$ref; ++$i) {
 		print "<td title='Edit'>\n<a href='#' class='js-open-modal' data-modal='1' id=\'id".$i."_".$$ref[0]."'>$$ref[$i]</a></td>\n";
 	}
 	print "<td class='cellDel' title='Delete'><a href='index.pl?delid=".$$ref[0]."'><img src='image/delete.png'></a></td>\n";
